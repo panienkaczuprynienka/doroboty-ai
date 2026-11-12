@@ -272,7 +272,9 @@ test("map, hash deep links and unknown records work without external requests", 
   await page.goto("/#/oferty/missing");
   await expect(page.getByRole("heading", { name: "Nie znaleziono strony" })).toBeVisible();
 });
-test("mobile navigation, light-only appearance and keyboard person selection", async ({ page }) => {
+test("mobile navigation, approved dark appearance and keyboard person selection", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/#/auth/sign-in");
   const anna = page.getByRole("button", { name: "Wejdź jako Anna Kowalska", exact: true });
@@ -289,8 +291,8 @@ test("mobile navigation, light-only appearance and keyboard person selection", a
   await page.reload();
   await expect(page.getByRole("combobox", { name: "Motyw" })).toHaveCount(0);
   await expect(page.locator("html")).not.toHaveClass(/dark/);
-  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(244, 244, 240)");
-  await page.screenshot({ path: "artifacts/settings-mobile-light.png", fullPage: true });
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(8, 14, 27)");
+  await page.screenshot({ path: "artifacts/settings-mobile-dark.png", fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 test("core screens have no serious accessibility violations", async ({ page }) => {
@@ -441,7 +443,7 @@ for (const width of [1440, 375]) {
   });
 }
 
-test("legacy dark preference keeps scenario data and renders the light interface", async ({
+test("legacy appearance preference keeps scenario data and the approved dark interface", async ({
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "dark" });
@@ -458,7 +460,7 @@ test("legacy dark preference keeps scenario data and renders the light interface
     "Zachowaj mój profil",
   );
   await expect(page.locator("html")).not.toHaveClass(/dark/);
-  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(244, 244, 240)");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(8, 14, 27)");
   await page.getByRole("button", { name: "Zapisz profil", exact: true }).click();
   expect(
     await page.evaluate((key) => JSON.parse(localStorage.getItem(key)!).theme, STORAGE_KEY),
@@ -648,15 +650,16 @@ for (const width of [1280, 390])
     await expect(page.getByRole("textbox", { name: "Szukaj ofert", exact: true })).toHaveValue("");
   });
 
-test("homepage surfaces and marketplace action type roles match the shared reference", async ({
+test("homepage surfaces match the approved fork theme and marketplace actions keep their type roles", async ({
   page,
 }) => {
   await page.goto("/#/");
   const cards = page.locator("main article.prototype-panel");
   await expect(cards).toHaveCount(3);
   for (const card of await cards.all()) {
-    await expect(card).toHaveCSS("border-radius", "24px");
-    await expect(card).toHaveCSS("box-shadow", /rgb\(24, 24, 24\).*1px inset/);
+    await expect(card).toHaveCSS("border-radius", "10px");
+    await expect(card).toHaveCSS("box-shadow", "none");
+    await expect(card).toHaveCSS("border-top", "1px solid rgb(38, 53, 76)");
   }
   for (const [width, searchSize, offerSize, payLine] of [
     [1280, "14px", "14px", "34.8px"],
@@ -673,7 +676,8 @@ test("homepage surfaces and marketplace action type roles match the shared refer
     await expect(search).toHaveCSS("font-weight", "600");
     await expect(search).toHaveCSS("letter-spacing", "normal");
     await expect(search).toHaveCSS("line-height", `${parseInt(searchSize) * 1.5}px`);
-    await expect(search).toHaveCSS("border-top-width", "1px");
+    await expect(search).toHaveCSS("border-top-width", "0px");
+    await expect(search).toHaveCSS("background-color", "rgb(52, 92, 236)");
     await expect(search).toHaveCSS("box-shadow", "none");
     await page.goto("/#/oferty/ai-product-manager");
     const action = page.locator(".pp-offer-actions a").first();
@@ -994,4 +998,50 @@ test("candidate snapshot supports custom CV and long content at desktop and mobi
   await expect(page.getByRole("tabpanel", { name: "Odpowiedź", exact: true })).toContainText(
     record.answer,
   );
+});
+
+test("multiple project cards survive submission and later profile edits", async ({ page }) => {
+  await choose(page, "Anna Kowalska");
+  await page.goto("/#/app/profil");
+  await expect(page.getByLabel("Cel projektu", { exact: true })).toHaveCount(2);
+  await page.getByRole("button", { name: "Dodaj projekt", exact: true }).click();
+  const group = page.getByRole("group", { name: "Projekt 3", exact: true });
+  for (const [label, value] of [
+    ["Firma lub organizacja", "Firma testowa"],
+    ["Stanowisko", "Product Manager"],
+    ["Okres pracy przy projekcie", "2025–2026"],
+    ["Cel projektu", "Trzeci projekt regresyjny"],
+    ["Moje działania", "Badania użytkowników"],
+    ["Działania zespołu", "Implementacja"],
+    ["Moja odpowiedzialność", "Decyzje o zakresie"],
+    ["Rezultat", "Zweryfikowany prototyp"],
+  ])
+    await group.getByLabel(label, { exact: true }).fill(value);
+  await page.getByRole("button", { name: "Zapisz profil", exact: true }).click();
+  await page.reload();
+  await expect(page.getByLabel("Cel projektu", { exact: true })).toHaveCount(3);
+  await application(page);
+  await page.getByRole("link", { name: "AI Product Manager", exact: true }).click();
+  const id = page.url().split("/").pop();
+  await page.goto("/#/app/profil");
+  await page.getByLabel("Cel projektu", { exact: true }).nth(2).fill("Zmieniony później");
+  await page.getByRole("button", { name: "Zapisz profil", exact: true }).click();
+  await choose(page, "Karolina Wiśniewska");
+  await page.goto(`/#/app/kandydaci/${id}`);
+  await page.getByRole("tab", { name: "Projekty", exact: true }).click();
+  await expect(page.getByRole("tabpanel", { name: "Projekty", exact: true })).toContainText(
+    "Trzeci projekt regresyjny",
+  );
+  await expect(page.getByRole("tabpanel", { name: "Projekty", exact: true })).not.toContainText(
+    "Zmieniony później",
+  );
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  }
+  const accessibility = await new AxeBuilder({ page }).include(".recruiting-record").analyze();
+  expect(accessibility.violations).toEqual([]);
+  await page.screenshot({ path: "artifacts/project-cards-mobile.png", fullPage: true });
 });

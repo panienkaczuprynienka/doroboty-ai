@@ -59,11 +59,23 @@ export const jobSchema = z
       job.salaryMin === undefined || job.salaryMax === undefined || job.salaryMin <= job.salaryMax,
     { path: ["salaryMax"], message: "Salary maximum must not be below minimum" },
   );
+export const projectCardSchema = z.object({
+  organization: shortText.optional(),
+  position: shortText.optional(),
+  period: shortText.optional(),
+  goal: shortText,
+  candidateActions: text.min(1),
+  teamActions: text.min(1),
+  responsibility: text.min(1),
+  result: text.min(1),
+});
+export type ProjectCard = z.infer<typeof projectCardSchema>;
 export const profileSchema = z.object({
   name: shortText,
   headline: shortText,
   bio: text,
   location: shortText,
+  projectCards: z.array(projectCardSchema).max(20).optional(),
 });
 const personSchema = profileSchema.extend({
   id,
@@ -112,6 +124,7 @@ const applicationSchema = z.object({
   jobTitle: shortText,
   candidateName: shortText,
   cv: text.min(20),
+  projectCards: z.array(projectCardSchema).max(20).optional(),
   answer: text.min(MIN_APPLICATION_ANSWER_LENGTH),
   sourceNotes: text,
   generatedAnswer: text,
@@ -132,7 +145,7 @@ const draftSchema = z.object({
 });
 export const stateSchema = z
   .object({
-    version: z.literal(1),
+    version: z.literal(2),
     activePersonId: id.nullable(),
     companies: z.array(companySchema).min(1).max(200),
     jobs: z.array(jobSchema).min(1).max(1000),
@@ -217,7 +230,7 @@ export type Action =
 
 export function initialState(): State {
   const state = stateSchema.parse({
-    version: 1,
+    version: 2,
     activePersonId: null,
     ...marketplace,
     people,
@@ -235,6 +248,7 @@ export function initialState(): State {
     jobTitle: job.title,
     candidateName: bob.name,
     cv: bob.cv,
+    projectCards: bob.projectCards,
     answer:
       "Pracowałem nad automatyzacją obsługi zgłoszeń. Poprowadziłem badania z użytkownikami i wdrożenie, które skróciło czas odpowiedzi o 25%. Chętnie opowiem o decyzjach i ograniczeniach tego projektu.",
     sourceNotes: "",
@@ -278,9 +292,12 @@ export function transition(
     if (action.id !== null && !s.people.some((x) => x.id === action.id))
       fail("Nie znaleziono osoby.");
     s.activePersonId = action.id;
-  } else if (action.type === "profile")
-    Object.assign(candidate(), profileSchema.parse(action.value));
-  else if (action.type === "toggle_saved") {
+  } else if (action.type === "profile") {
+    const person = candidate();
+    const profile = profileSchema.parse(action.value);
+    Object.assign(person, profile);
+    if (!profile.projectCards) delete person.projectCards;
+  } else if (action.type === "toggle_saved") {
     const p = candidate();
     if (!s.jobs.some((x) => x.id === action.jobId)) fail("Nie znaleziono oferty.");
     const index = s.saved.findIndex((x) => x.candidateId === p.id && x.jobId === action.jobId);
@@ -307,6 +324,7 @@ export function transition(
         jobTitle: job.title,
         candidateName: p.name,
         cv: p.cv,
+        projectCards: p.projectCards,
         answer: action.answer,
         sourceNotes: action.notes,
         generatedAnswer: action.generated,

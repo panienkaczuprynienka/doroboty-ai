@@ -6,6 +6,28 @@
     "headline": "Product Manager · AI i automatyzacja",
     "bio": "Łączę badania użytkowników, eksperymenty i pracę z zespołami technicznymi.",
     "location": "Warszawa",
+    "projectCards": [
+      {
+        "organization": "Przykładowa firma produktowa",
+        "position": "Product Manager",
+        "period": "2022–2026",
+        "goal": "Usprawnić obsługę zgłoszeń zespołów operacyjnych za pomocą asystenta AI.",
+        "candidateActions": "Przeprowadziłam badania z 18 użytkownikami, ustaliłam priorytety produktu i prowadziłam rozwój asystenta od discovery do wdrożenia.",
+        "teamActions": "Zespół inżynierski zbudował i zintegrował asystenta. Zespół operacyjny korzystał z niego podczas obsługi zgłoszeń.",
+        "responsibility": "Odpowiadałam za badania użytkowników, priorytetyzację oraz prowadzenie wdrożenia produktu.",
+        "result": "Czas obsługi zgłoszeń skrócił się o 30%."
+      },
+      {
+        "organization": "Przykładowa firma produktowa",
+        "position": "Product Analyst",
+        "period": "2019–2022",
+        "goal": "Rozpoznawać miejsca odpływu użytkowników i sprawdzać, czy zmiany produktu poprawiają konwersję.",
+        "candidateActions": "Analizowałam lejki użytkowników oraz przygotowywałam i oceniałam eksperymenty A/B.",
+        "teamActions": "Zespół produktowy wdrażał uzgodnione zmiany i wspólnie omawiał wyniki eksperymentów.",
+        "responsibility": "Odpowiadałam za analizę lejków i przygotowanie analiz eksperymentów A/B.",
+        "result": "Przykładowe CV nie podaje osobnego wyniku liczbowego dla tej pracy."
+      }
+    ],
     "cv": "Anna Kowalska — Product Manager\n2022–2026: prowadzenie rozwoju narzędzi dla zespołów operacyjnych. Badania z 18 użytkownikami, priorytetyzacja i wdrożenie asystenta do zgłoszeń. Skrócenie czasu obsługi o 30%.\n2019–2022: Product Analyst. Analiza lejków i eksperymenty A/B.\nUmiejętności: discovery, analityka produktu, współpraca z inżynierami, prototypowanie AI.",
     "exampleScore": 84,
     "exampleSummary": "Doświadczenie w badaniach użytkowników i wdrażaniu automatyzacji. Warto porozmawiać o sposobie mierzenia efektów i współpracy z zespołem."
@@ -17,6 +39,28 @@
     "headline": "Product Owner · produkty B2B",
     "bio": "Rozwijam narzędzia wspierające obsługę klientów.",
     "location": "Kraków",
+    "projectCards": [
+      {
+        "organization": "Platforma B2B (przykład)",
+        "position": "Product Owner",
+        "period": "2021–2026",
+        "goal": "Usprawnić obsługę zgłoszeń klientów platformy B2B.",
+        "candidateActions": "Prowadziłem warsztaty z użytkownikami i porządkowałem backlog.",
+        "teamActions": "Zespół wdrożeniowy pracował nad automatyzacją obsługi zgłoszeń.",
+        "responsibility": "Mój zakres decyzji technicznych wymaga doprecyzowania.",
+        "result": "Czas odpowiedzi skrócił się o 25%."
+      },
+      {
+        "organization": "Platforma B2B (przykład)",
+        "position": "Product Owner",
+        "period": "2021–2026",
+        "goal": "Ułatwić klientom B2B samodzielne zgłaszanie i śledzenie problemów na platformie.",
+        "candidateActions": "Zbierałem potrzeby klientów podczas warsztatów i przekładałem je na uporządkowane elementy backlogu.",
+        "teamActions": "Zespół produktowo-inżynierski wdrażał kolejne usprawnienia platformy.",
+        "responsibility": "Odpowiadałem za porządkowanie backlogu; zakres decyzji technicznych wymagał doprecyzowania.",
+        "result": "Symulowany przykład. Przykładowe CV nie podaje osobnego wyniku tej inicjatywy."
+      }
+    ],
     "cv": "Marek Nowak — Product Owner\n2021–2026: rozwój platformy B2B. Automatyzacja obsługi zgłoszeń i skrócenie czasu odpowiedzi o 25%. Prowadzenie warsztatów z użytkownikami, praca z backlogiem i zespołem wdrożeniowym.",
     "exampleScore": 72,
     "exampleSummary": "Doświadczenie w produktach B2B i automatyzacji obsługi. Podczas rozmowy warto doprecyzować zakres samodzielnych decyzji."

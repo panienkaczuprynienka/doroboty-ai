@@ -6,8 +6,10 @@
 @import "./poster-people.css";
 @import "./marketplace.css";
 @import "./records.css";
+@import "./project-contribution.css";
 @import "./application.css";
 @import "./interactions.css";
+@import "./doroboty-tech-human.css";
 
 @theme inline {
   --color-background: var(--background);

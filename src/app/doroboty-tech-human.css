@@ -1,0 +1,578 @@
+/* Adapt the existing DoRoboty flow to the user-approved landing page system. */
+:root {
+  color-scheme: dark;
+
+  --gui-font-ui: "Helvetica Neue", Arial, sans-serif;
+  --gui-font-brand: "Helvetica Neue", Arial, sans-serif;
+  --gui-font-editorial: "Helvetica Neue", Arial, sans-serif;
+  --gui-font-data: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --font-body: "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Helvetica Neue", Arial, sans-serif;
+  --font-interface: "Helvetica Neue", Arial, sans-serif;
+  --font-code: ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  --gui-neutral-1: #111d31;
+  --gui-neutral-2: #111d31;
+  --gui-neutral-3: #0c1525;
+  --gui-neutral-4: #26354c;
+  --gui-neutral-5: #40516a;
+  --gui-neutral-6: #7486a0;
+  --gui-neutral-7: #a4b4cc;
+  --gui-neutral-8: #c4d0e2;
+  --gui-neutral-9: #edf3ff;
+  --gui-neutral-10: #edf3ff;
+  --gui-color-1: #345cec;
+  --gui-color-1-transparent: #345cec26;
+  --gui-color-2: #83a5ff;
+  --gui-color-2-transparent: #83a5ff26;
+  --gui-color-3: #1d2e54;
+  --gui-color-4: #15353e;
+  --gui-match-red: #30254b;
+  --gui-match-orange: #1d2e54;
+  --gui-match-yellow: #1d2e54;
+  --gui-match-green: #15353e;
+  --gui-canvas: #080e1b;
+  --gui-surface: #111d31;
+  --gui-surface-muted: #0c1525;
+  --gui-text: #edf3ff;
+  --gui-text-muted: #a4b4cc;
+  --gui-text-muted-accessible: #a4b4cc;
+  --gui-edge: #26354c;
+  --gui-accent: #83a5ff;
+  --gui-accent-text: #ffffff;
+  --gui-accent-text-accessible: #ffffff;
+  --gui-focus: #83a5ff;
+  --gui-link: #83a5ff;
+  --gui-control: #0c1525;
+  --gui-control-hover: #1d2e54;
+  --gui-control-disabled: #0c1525;
+  --gui-control-readonly: #111d31;
+  --gui-edge-shadow: inset 0 0 0 1px #26354c;
+  --gui-divider-top-shadow: inset 0 1px #26354c;
+  --gui-divider-bottom-shadow: inset 0 -1px #26354c;
+  --gui-divider-inline-end-shadow: inset -1px 0 #26354c;
+  --gui-accent-bar-shadow: inset 4px 0 #83a5ff;
+  --gui-control-shadow: inset 0 0 0 1px #26354c;
+  --gui-radius-xs: 5px;
+  --gui-radius-s: 10px;
+  --gui-radius-m: 10px;
+  --gui-radius-l: 10px;
+  --gui-radius-xl: 10px;
+
+  --background: #080e1b;
+  --foreground: #edf3ff;
+  --card: #111d31;
+  --card-foreground: #edf3ff;
+  --popover: #111d31;
+  --popover-foreground: #edf3ff;
+  --primary: #345cec;
+  --primary-foreground: #ffffff;
+  --secondary: #0c1525;
+  --secondary-foreground: #edf3ff;
+  --muted: #0c1525;
+  --muted-foreground: #a4b4cc;
+  --accent: #1d2e54;
+  --accent-foreground: #edf3ff;
+  --border: #26354c;
+  --input: #0c1525;
+  --ring: #83a5ff;
+  --sidebar: #0c1525;
+  --sidebar-foreground: #edf3ff;
+  --sidebar-primary: #345cec;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1d2e54;
+  --sidebar-accent-foreground: #edf3ff;
+  --sidebar-border: #26354c;
+  --sidebar-ring: #83a5ff;
+
+  --pp-paper: #0c1525;
+  --pp-surface: #111d31;
+  --pp-ink: #edf3ff;
+  --pp-muted: #a4b4cc;
+  --pp-line: #26354c;
+  --pp-action: #345cec;
+  --pp-action-hover: #456cf4;
+  --pp-fact: #1d2e54;
+  --pp-yellow: #15353e;
+  --pp-surface-hover: #15243b;
+  --pp-radius: 10px;
+  --pp-radius-small: 8px;
+  --pp-radius-large: 10px;
+  --pp-font-heading: "Helvetica Neue", Arial, sans-serif;
+  --pp-font: "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  background: #080e1b;
+}
+
+body {
+  background: radial-gradient(ellipse at 84% 0, #132445 0, transparent 35rem), #080e1b;
+  color: #edf3ff;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.brand {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[data-slot="button"] {
+  border-radius: 8px;
+}
+
+input,
+select,
+textarea {
+  color: #edf3ff;
+  background-color: #0c1525;
+  border-color: #26354c;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #a4b4cc;
+  opacity: 0.75;
+}
+
+.app-frame,
+.workspace {
+  background: transparent;
+}
+
+.sidebar {
+  background: #0c1525;
+  box-shadow: inset -1px 0 #26354c;
+}
+
+.workspace-avatar {
+  background: #1d2e54;
+  color: #edf3ff;
+  box-shadow: inset 0 0 0 1px #26354c;
+}
+
+.topbar {
+  background: #0c1525;
+  color: #a4b4cc;
+}
+
+header:has([aria-label="Główna nawigacja"]) {
+  border-bottom: 1px solid #26354c;
+  background: #0c1525;
+}
+
+header:has([aria-label="Główna nawigacja"]) a {
+  color: #edf3ff;
+}
+
+footer {
+  border-top: 1px solid #26354c;
+  background: #0c1525;
+  color: #a4b4cc;
+}
+
+footer a {
+  color: #83a5ff;
+}
+
+.nav-active,
+.pp-view-link[aria-current="page"] {
+  background: #1d2e54;
+  color: #edf3ff;
+}
+
+.nav-link:hover,
+.pp-category-tab:hover:not(.pp-selected) {
+  background: #15243b;
+}
+
+.brand-mark,
+.status-dot {
+  background: #345cec;
+  color: #fff;
+}
+
+.demo-banner,
+.prototype-panel,
+.record-sheet,
+.project-contribution-editor,
+.project-contribution-card {
+  border: 1px solid #26354c;
+  border-radius: 10px;
+  background: #111d31;
+  box-shadow: none;
+}
+
+.demo-banner {
+  background: #0c1525;
+}
+
+.prototype-notice {
+  border: 1px solid #26354c;
+  border-radius: 10px;
+  background: #111d31;
+  color: #edf3ff;
+}
+
+.project-contribution-editor {
+  padding: 24px;
+}
+
+.project-contribution-editor legend {
+  padding-inline: 8px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.project-contribution-help,
+.project-contribution-card > p,
+.record-caption,
+.application-header p {
+  color: #a4b4cc;
+}
+
+.project-contribution-card {
+  padding: 24px;
+  background: #0c1525;
+}
+
+.project-contribution-list {
+  display: grid;
+  gap: 16px;
+}
+
+.project-contribution-item {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #26354c;
+  border-radius: 8px;
+  background: #0c1525;
+}
+
+.project-contribution-item > legend {
+  padding-inline: 8px;
+  color: #83a5ff;
+  font-size: 16px;
+  font-weight: 550;
+}
+
+.project-contribution-context-fields {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.8fr;
+  gap: 12px;
+}
+
+.project-contribution-item > button {
+  justify-self: start;
+}
+
+.project-contribution-context {
+  color: #a4b4cc;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.project-contribution-section {
+  display: grid;
+  gap: 10px;
+  padding-block: 20px;
+  border-block: 1px solid #26354c;
+}
+
+.project-contribution-eyebrow,
+.project-contribution-goal > span,
+.project-contribution-result > span {
+  color: #83a5ff;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.project-contribution-eyebrow {
+  margin: 0;
+}
+
+.project-contribution-section > h2 {
+  margin: 0;
+  font-size: clamp(25px, 3vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.project-contribution-content {
+  display: grid;
+  gap: 8px;
+}
+
+.project-contribution-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 0.8fr);
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.project-contribution-goal,
+.project-contribution-result {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #26354c;
+  border-radius: 8px;
+  background: #111d31;
+}
+
+.project-contribution-goal h3 {
+  margin: 8px 0 0;
+  color: #edf3ff;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+.project-contribution-result {
+  border-color: #345cec;
+  background: linear-gradient(135deg, #1d2e54, #111d31 80%);
+}
+
+.project-contribution-result strong {
+  display: block;
+  margin-top: 8px;
+  color: #edf3ff;
+  font-size: 18px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.project-contribution-fact {
+  border-color: #26354c;
+}
+
+.project-contribution-fact dt,
+.project-contribution-fact dd {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.project-contribution-fact dt {
+  color: #a4b4cc;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.project-contribution-fact dd {
+  color: #edf3ff;
+}
+
+.page-heading {
+  border-color: #26354c;
+}
+
+.page-heading h1 {
+  max-width: 850px;
+  font-size: clamp(34px, 3.8vw, 48px);
+}
+
+.project-contribution-fact:nth-child(2) {
+  background: linear-gradient(#1d2e54, #1d2e54) left 18px / 3px calc(100% - 36px) no-repeat;
+}
+
+.record-sheet {
+  padding: 24px 28px;
+}
+
+.record-tabs {
+  border-color: #26354c;
+}
+
+.record-tab[data-active] {
+  color: #edf3ff;
+}
+
+.record-tab[data-active]::after {
+  height: 2px;
+  background: #83a5ff;
+}
+
+.record-section,
+.record-footer {
+  border-color: #26354c;
+}
+
+.record-stage {
+  background: #1d2e54;
+  color: #edf3ff;
+  border-radius: 8px;
+}
+
+.match-score {
+  border: 1px solid #345cec;
+  border-radius: 8px;
+  background: #1d2e54 !important;
+  color: #edf3ff;
+}
+
+.record-sheet h2 {
+  font-size: 24px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.recruiting-header h1,
+.application-header h1 {
+  max-width: 850px;
+  font-size: clamp(34px, 4vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.recruiting-margin h2 {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.process-timeline li::before {
+  border-color: #83a5ff;
+  background: #345cec;
+}
+
+.process-timeline li::after {
+  background: #26354c;
+}
+
+.pp-search-form,
+.pp-category-tab,
+.pp-filter-panel,
+.pp-job-card,
+.pp-offer-panel,
+.pp-offer-hero,
+.pp-filter-dialog[data-slot="dialog-content"],
+.application-offer,
+.application-form {
+  border-color: #26354c;
+  border-radius: 10px;
+}
+
+.pp-search-form,
+.pp-filter-panel,
+.pp-job-card,
+.pp-offer-panel,
+.pp-offer-hero,
+.pp-filter-dialog[data-slot="dialog-content"],
+.application-offer,
+.application-form,
+.pp-filter-button {
+  background-color: #111d31;
+}
+
+.pp-search-submit,
+.pp-offer-actions > a,
+.pp-offer-actions > button,
+.pp-detail-button {
+  border: 0;
+  border-radius: 8px;
+  background: #345cec;
+  color: #fff;
+}
+
+.pp-category-tab {
+  background: #0c1525;
+}
+
+.pp-category-tab.pp-selected,
+.pp-view-link[aria-current="page"] {
+  background: #1d2e54;
+  color: #edf3ff;
+}
+
+.pp-category-tab.pp-selected small {
+  color: #a4b4cc;
+}
+
+.pp-job-card,
+.pp-filter-panel,
+.pp-offer-panel,
+.application-offer,
+.application-form {
+  box-shadow: none;
+}
+
+.pp-job-card > [data-company-logo],
+.pp-offer-identity > [data-company-logo],
+.application-company [data-company-logo] {
+  border-color: #26354c;
+  border-radius: 8px;
+  background: #1d2e54;
+  color: #edf3ff;
+}
+
+.application-offer-facts,
+.application-form-intro,
+.application-description summary {
+  border-color: #26354c;
+}
+
+.application-description summary:hover {
+  background: #1d2e54;
+}
+
+.application-pay .pp-salary-tag {
+  color: #edf3ff;
+}
+
+.skip-link {
+  border-radius: 8px;
+}
+
+@media (max-width: 760px) {
+  .pp-container {
+    width: calc(100% - 36px);
+  }
+
+  .record-sheet,
+  .project-contribution-editor,
+  .project-contribution-card {
+    padding: 18px;
+  }
+
+  .project-contribution-overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .project-contribution-context-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .recruiting-header h1,
+  .application-header h1 {
+    font-size: 34px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

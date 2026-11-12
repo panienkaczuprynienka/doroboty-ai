@@ -10,12 +10,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { JobCard } from "@/features/jobs/job-card";
 import { ApplicationOfferPreview } from "@/features/jobs/application-offer-preview";
 import { usePrototype } from "./store";
-import { currentPerson, publishedJobs, stageLabels, MIN_APPLICATION_ANSWER_LENGTH } from "./model";
+import {
+  currentPerson,
+  publishedJobs,
+  stageLabels,
+  MIN_APPLICATION_ANSWER_LENGTH,
+  type ProjectCard,
+} from "./model";
 import { PageTitle, Empty, NotFound, Notice } from "./shell";
 import { CvAttachment } from "./cv-attachment";
 import { MatchScore } from "./match-score";
 import { RecruitingApplication } from "./recruiting-application";
 import { CandidateApplication } from "./candidate-application";
+import { ProjectContributionCard } from "./project-contribution-card";
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -31,10 +38,9 @@ export function PersonPicker() {
   const [params] = useSearchParams();
   const next = params.get("next");
   const audience = params.get("audience");
-  const people =
-    audience === "candidate" || audience === "employer"
-      ? state.people.filter((person) => person.role === audience)
-      : state.people;
+  const people = ["candidate", "employer", "operator"].includes(audience ?? "")
+    ? state.people.filter((person) => person.role === audience)
+    : state.people.filter((person) => person.role !== "operator");
   const safeNext = next && /^\/(?!\/)/.test(next) && !next.startsWith("/auth") ? next : null;
   return (
     <section className="prototype-section max-w-4xl">
@@ -143,6 +149,13 @@ export function ProfilePage({ preview = false }: { preview?: boolean }) {
   const { state, run } = usePrototype();
   const person = currentPerson(state)!;
   const [message, setMessage] = useState("");
+  const [projectCards, setProjectCards] = useState<ProjectCard[]>(person.projectCards ?? []);
+  useEffect(() => setProjectCards(person.projectCards ?? []), [person.id, person.projectCards]);
+  function updateProjectCard(index: number, key: keyof ProjectCard, value: string) {
+    setProjectCards((cards) =>
+      cards.map((card, cardIndex) => (cardIndex === index ? { ...card, [key]: value } : card)),
+    );
+  }
   function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -154,6 +167,7 @@ export function ProfilePage({ preview = false }: { preview?: boolean }) {
           headline: String(data.get("headline")),
           bio: String(data.get("bio")),
           location: String(data.get("location")),
+          projectCards,
         },
       })
     )
@@ -177,6 +191,21 @@ export function ProfilePage({ preview = false }: { preview?: boolean }) {
         <div className="prototype-panel space-y-4">
           <h2>{person.headline}</h2>
           <p>{person.location}</p>
+          {person.role === "candidate" && projectCards.length > 0 && (
+            <section
+              className="project-contribution-section"
+              aria-labelledby="profile-project-heading"
+            >
+              <p className="project-contribution-eyebrow">DOŚWIADCZENIE ZAWODOWE</p>
+              <h2 id="profile-project-heading">Projekty i mój wkład</h2>
+              <p className="project-contribution-help">
+                Przykładowe dane prototypu. Szczegóły części projektów są symulowane.
+              </p>
+              {projectCards.map((project, index) => (
+                <ProjectContributionCard project={project} key={`${project.goal}-${index}`} />
+              ))}
+            </section>
+          )}
           <p>{person.bio}</p>
         </div>
       ) : (
@@ -193,6 +222,127 @@ export function ProfilePage({ preview = false }: { preview?: boolean }) {
           <Field label="O mnie">
             <Textarea name="bio" maxLength={12000} defaultValue={person.bio} />
           </Field>
+          {person.role === "candidate" && (
+            <fieldset className="project-contribution-editor">
+              <legend>Doświadczenie i udział w projektach</legend>
+              <p className="project-contribution-help">
+                Dodaj osobną sekcję dla każdego projektu. Wskaż miejsce i okres pracy, a potem
+                oddziel swój wkład od działań zespołu. To przykładowe dane prototypu — popraw je
+                przed wysłaniem. Sekcje zobaczy rekruter razem z aplikacją.
+              </p>
+              {projectCards.map((project, index) => (
+                <fieldset className="project-contribution-item" key={index}>
+                  <legend>Projekt {index + 1}</legend>
+                  <div className="project-contribution-context-fields">
+                    <Field label="Firma lub organizacja">
+                      <Input
+                        required
+                        maxLength={200}
+                        value={project.organization ?? ""}
+                        onChange={(event) =>
+                          updateProjectCard(index, "organization", event.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field label="Stanowisko">
+                      <Input
+                        required
+                        maxLength={200}
+                        value={project.position ?? ""}
+                        onChange={(event) =>
+                          updateProjectCard(index, "position", event.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field label="Okres pracy przy projekcie">
+                      <Input
+                        required
+                        maxLength={200}
+                        value={project.period ?? ""}
+                        onChange={(event) => updateProjectCard(index, "period", event.target.value)}
+                      />
+                    </Field>
+                  </div>
+                  <Field label="Cel projektu">
+                    <Input
+                      required
+                      maxLength={200}
+                      value={project.goal}
+                      onChange={(event) => updateProjectCard(index, "goal", event.target.value)}
+                    />
+                  </Field>
+                  <Field label="Moje działania">
+                    <Textarea
+                      required
+                      maxLength={12000}
+                      value={project.candidateActions}
+                      onChange={(event) =>
+                        updateProjectCard(index, "candidateActions", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Działania zespołu">
+                    <Textarea
+                      required
+                      maxLength={12000}
+                      value={project.teamActions}
+                      onChange={(event) =>
+                        updateProjectCard(index, "teamActions", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Moja odpowiedzialność">
+                    <Textarea
+                      required
+                      maxLength={12000}
+                      value={project.responsibility}
+                      onChange={(event) =>
+                        updateProjectCard(index, "responsibility", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Rezultat">
+                    <Textarea
+                      required
+                      maxLength={12000}
+                      value={project.result}
+                      onChange={(event) => updateProjectCard(index, "result", event.target.value)}
+                    />
+                  </Field>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setProjectCards((cards) => cards.filter((_, i) => i !== index))}
+                  >
+                    Usuń projekt {index + 1}
+                  </Button>
+                </fieldset>
+              ))}
+              {projectCards.length < 20 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    setProjectCards((cards) => [
+                      ...cards,
+                      {
+                        organization: "",
+                        position: "",
+                        period: "",
+                        goal: "",
+                        candidateActions: "",
+                        teamActions: "",
+                        responsibility: "",
+                        result: "",
+                      },
+                    ])
+                  }
+                >
+                  Dodaj projekt
+                </Button>
+              )}
+            </fieldset>
+          )}
           <Button type="submit">Zapisz profil</Button>
           {message && <p role="status">{message}</p>}
         </form>

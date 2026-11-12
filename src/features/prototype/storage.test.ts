@@ -26,7 +26,7 @@ describe("browser persistence and recovery", () => {
     expect(parseState(serializeState(s))).toEqual(s);
   });
   it("protects incompatible/corrupt original saves", () => {
-    for (const raw of ["{", JSON.stringify({ ...initialState(), version: 2 })]) {
+    for (const raw of ["{", JSON.stringify({ ...initialState(), version: 3 })]) {
       const storage = memory(raw);
       const loaded = readState(storage);
       expect(loaded.blocked).toBe(true);
@@ -68,4 +68,44 @@ describe("browser persistence and recovery", () => {
       expect(parseState(JSON.stringify({ ...state, theme }))).toEqual(state);
     }
   });
+});
+
+describe("project card migration", () => {
+  it("preserves current edits and submitted snapshots without fixture enrichment", () => {
+    const state = initialState();
+    const card = { ...state.people[0].projectCards![0] };
+    delete card.organization;
+    delete card.position;
+    delete card.period;
+    state.people[0].projectCards = [card];
+    state.applications[0].projectCards = [card];
+    expect(parseState(serializeState(state))).toEqual(state);
+  });
+  it("migrates legacy single cards once and does not rewrite submitted content", () => {
+    const state = initialState();
+    const card = { ...state.people[0].projectCards![0] };
+    delete card.organization;
+    const legacy = JSON.parse(JSON.stringify(state));
+    legacy.version = 1;
+    delete legacy.people[0].projectCards;
+    legacy.people[0].projectCard = { ...card, result: "Human edited result" };
+    delete legacy.applications[0].projectCards;
+    legacy.applications[0].projectCard = card;
+    const migrated = parseState(JSON.stringify(legacy));
+    expect(migrated.version).toBe(2);
+    expect(migrated.people[0].projectCards![0].result).toBe("Human edited result");
+    expect(migrated.applications[0].projectCards).toEqual([card]);
+    expect(parseState(serializeState(migrated))).toEqual(migrated);
+  });
+});
+
+it("preserves a full legacy profile instead of exceeding the 20-card limit", () => {
+  const state = initialState();
+  const cards = Array.from({ length: 20 }, (_, index) => ({
+    ...state.people[0].projectCards![0],
+    goal: `Custom project ${index}`,
+  }));
+  state.people[0].projectCards = cards;
+  const migrated = parseState(JSON.stringify({ ...state, version: 1 }));
+  expect(migrated.people[0].projectCards).toEqual(cards);
 });

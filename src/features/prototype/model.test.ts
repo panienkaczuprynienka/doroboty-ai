@@ -52,6 +52,47 @@ describe("coherent browser scenario", () => {
     expect(app.sourceNotes).toBe("Original notes");
     expect(app.generatedAnswer).toBe("Generated copy");
   });
+  it("captures the project card at submission and keeps it stable after profile edits", () => {
+    const state = as(initialState(), "candidate-marek");
+    const submittedState = transition(
+      state,
+      {
+        type: "submit",
+        jobId: state.jobs[1].id,
+        notes: "",
+        generated: "",
+        answer: "Approved application with sufficient context.",
+        consent: true,
+      },
+      time,
+      "application-marek",
+    );
+    const savedCard = submittedState.applications.find(
+      (application) => application.id === "application-marek",
+    )?.projectCards?.[0];
+    expect(savedCard?.goal).toContain("obsługę zgłoszeń");
+    const changed = transition(submittedState, {
+      type: "profile",
+      value: {
+        name: "Marek Nowak",
+        headline: "Product Owner",
+        bio: "Updated profile",
+        location: "Kraków",
+        projectCards: [
+          { ...savedCard!, candidateActions: "Nowa treść profilu, po wysłaniu aplikacji." },
+        ],
+      },
+    });
+    expect(
+      changed.applications.find((application) => application.id === "application-marek")
+        ?.projectCards?.[0],
+    ).toEqual(savedCard);
+    expect(
+      changed.people.find((person) => person.id === "candidate-marek")?.projectCards?.[0]
+        ?.candidateActions,
+    ).toBe("Nowa treść profilu, po wysłaniu aplikacji.");
+    expect(stateSchema.safeParse(changed).success).toBe(true);
+  });
   it("supports employer review through conversation and continuation without skipping stages", () => {
     let s = as(submitted(), "employer-brightlabs");
     expect(() =>

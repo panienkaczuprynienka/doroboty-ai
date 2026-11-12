@@ -4,6 +4,7 @@ import { ProcessTimeline } from "@/components/process-timeline";
 import { RecordSheet } from "@/components/record-sheet";
 import { CvAttachment } from "./cv-attachment";
 import { MatchScore } from "./match-score";
+import { ProjectContributionCard } from "./project-contribution-card";
 import { stageLabels, type Application, type Stage } from "./model";
 
 type RecordEvent = { stage: Stage; at: string; note?: string };
@@ -24,7 +25,15 @@ export function ApplicationRecord({
 }: {
   application: Pick<
     Application,
-    "candidateId" | "candidateName" | "jobTitle" | "stage" | "answer" | "cv" | "score" | "summary"
+    | "candidateId"
+    | "candidateName"
+    | "jobTitle"
+    | "stage"
+    | "answer"
+    | "cv"
+    | "projectCards"
+    | "score"
+    | "summary"
   >;
   companyName: string;
   audience: "candidate" | "employer";
@@ -93,6 +102,33 @@ export function ApplicationRecord({
                 </>
               ),
             },
+            ...(application.projectCards?.length
+              ? [
+                  {
+                    value: "project",
+                    label: "Projekty",
+                    content: (
+                      <>
+                        <h3>Doświadczenie i udział w projektach</h3>
+                        <p className="record-caption">
+                          Dane przykładowe; szczegóły części kart są symulowane.
+                        </p>
+                        <div className="project-contribution-list">
+                          {application.projectCards.map((project, index) => (
+                            <ProjectContributionCard
+                              project={project}
+                              key={`${project.goal}-${index}`}
+                            />
+                          ))}
+                        </div>
+                        <p className="record-caption">
+                          Karty z profilu kandydata w chwili wysłania aplikacji.
+                        </p>
+                      </>
+                    ),
+                  },
+                ]
+              : []),
           ]}
           footer={footer}
         >
